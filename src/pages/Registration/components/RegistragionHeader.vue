@@ -2,11 +2,17 @@
 defineOptions({
   name: "RegistragionHeader",
 });
+const props = defineProps({
+  title: { type: String, required: true },
+  step: { type: Number, default: 1, required: true },
+});
 </script>
 <template>
   <header>
-    <h2>Etapa <span>1</span> de 4</h2>
-    <h1>Seja bem vindo (a)</h1>
+    <h2>
+      Etapa <span>{{ step }}</span> de 4
+    </h2>
+    <h1>{{ title }}</h1>
   </header>
 </template>
 <style lang="scss" scoped>

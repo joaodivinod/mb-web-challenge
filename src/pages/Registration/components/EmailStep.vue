@@ -1,16 +1,21 @@
 <script setup>
-import { ref, computed, defineEmits } from "vue";
+import { ref, computed, defineEmits, defineProps, watch } from "vue";
 import inputError from "@/components/inputError.vue";
 
 defineOptions({
   name: "EmailStep",
 });
 
-const emit = defineEmits(["nextStep"]);
+const props = defineProps({
+  email: { type: String, required: true },
+  userType: { type: String, default: "Pessoa Física", required: true },
+});
 
-const email = ref("");
+const emit = defineEmits(["nextStep", "setEmail", "setUserType"]);
+
+const email = ref(props.email);
 const emailError = ref("");
-const userType = ref("fisica");
+const userType = ref(props.userType);
 const hasTyped = ref(false);
 
 const validateEmail = () => {
@@ -26,35 +31,48 @@ const validateEmail = () => {
   }
 };
 
-// Computed property to check if the email is valid
 const isEmailValid = computed(() => {
   validateEmail();
   return emailError.value === "";
 });
 
-// Function to emit nextStep event
 const nextStep = () => {
   if (isEmailValid.value) {
+    emit("setEmail", email.value);
+    emit("setUserType", userType.value);
     emit("nextStep");
   }
 };
 
-// Function to handle user input
 const handleInput = () => {
   hasTyped.value = true;
   validateEmail();
 };
+
+watch(
+  () => props.email,
+  (newEmail) => {
+    email.value = newEmail;
+  }
+);
+
+watch(
+  () => props.userType,
+  (newUserType) => {
+    userType.value = newUserType;
+  }
+);
 </script>
 
 <template>
   <section class="email_step">
-    <div class="email_step-email">
+    <div class="defaultInput">
       <h3>Endereço de e-mail</h3>
       <input
         type="email"
         placeholder="seu endereço de e-mail"
         v-model="email"
-        @blur="handleInput"
+        @input="handleInput"
       />
       <inputError v-if="hasTyped" :errorMessage="emailError" />
     </div>
@@ -68,7 +86,7 @@ const handleInput = () => {
         Pessoa Jurídica
       </label>
     </div>
-    <div :class="['email_step-submit', { disabled: !isEmailValid }]">
+    <div :class="['submitButton', { disabled: !isEmailValid }]">
       <button @click="nextStep" :disabled="!isEmailValid">Continuar</button>
     </div>
   </section>
@@ -81,28 +99,6 @@ const handleInput = () => {
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
-
-  &-email {
-    width: 100%;
-    margin-bottom: 20px;
-    box-sizing: border-box;
-
-    & h3 {
-      font-size: 14px;
-      margin-bottom: 10px;
-      margin-left: 5px;
-    }
-
-    & input {
-      height: 40px;
-      color: rgba(0, 0, 0, 0.8);
-      width: 100%;
-      border-radius: 7px;
-      padding: 10px;
-      font-size: 14px;
-      box-sizing: border-box;
-    }
-  }
 
   &-type {
     width: 100%;
@@ -144,32 +140,5 @@ const handleInput = () => {
       }
     }
   }
-
-  &-submit {
-    margin-top: 20px;
-
-    & button {
-      width: 100%;
-      height: 40px;
-      background-color: $primary-color;
-      border: none;
-      font-size: 16px;
-      color: white;
-      border-radius: 8px;
-      transition: 300ms;
-      &:hover {
-        cursor: pointer;
-        filter: brightness(1.2);
-      }
-      &:disabled {
-        cursor: not-allowed;
-        filter: grayscale(1);
-      }
-    }
-  }
-}
-
-.disabled {
-  filter: grayscale(1);
 }
 </style>
