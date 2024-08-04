@@ -9,12 +9,17 @@ defineOptions({
   name: "RegistrationForm",
 });
 
-const currentStep = ref(1);
+const currentStep = ref(2);
 const email = ref("");
 const userType = ref("fisica");
 
 const finalValidation = reactive({
   firstStep: false,
+  secondStep: false,
+});
+
+const areAllStepsValid = computed(() => {
+  return Object.values(finalValidation).every((step) => step === true);
 });
 
 const infoStepData = reactive({
@@ -71,11 +76,11 @@ const title = computed(() => {
 });
 
 const validateFirstStep = (isEmailValid) => {
-  if (isEmailValid) {
-    finalValidation.firstStep = true;
-  } else {
-    finalValidation.firstStep = false;
-  }
+  finalValidation.firstStep = isEmailValid;
+};
+const validateSecondStep = (isValid) => {
+  console.log("validateSecondStep", isValid);
+  finalValidation.secondStep = isValid;
 };
 </script>
 
@@ -97,8 +102,7 @@ const validateFirstStep = (isEmailValid) => {
         :userType="userType"
         :infoStepData="infoStepData"
         @setInfoStepData="setInfoStepData"
-        @nextStep="nextStep"
-        @backStep="backStep"
+        @isSecondStepValid="validateSecondStep"
       />
       <PassWordStep
         v-if="currentStep === 3"
@@ -119,7 +123,9 @@ const validateFirstStep = (isEmailValid) => {
           <button @click="backStep">Voltar</button>
         </div>
         <div class="submitButton">
-          <button :disabled="!isFormValid" @click="nextStep">Continuar</button>
+          <button :disabled="!areAllStepsValid" @click="nextStep">
+            {{ currentStep === 4 ? "Cadastrar" : "Continuar" }}
+          </button>
         </div>
       </div>
     </section>

@@ -16,7 +16,7 @@ const props = defineProps({
   infoStepData: { type: Object, required: true },
 });
 
-const emit = defineEmits(["backStep", "nextStep", "setInfoStepData"]);
+const emit = defineEmits(["setInfoStepData", "isSecondStepValid"]);
 
 const isLegalPerson = computed(() => props.userType === "juridica");
 
@@ -33,10 +33,6 @@ const touched = reactive({
   date: false,
   phone: false,
 });
-
-const backStep = () => {
-  emit("backStep");
-};
 
 const validateField = (field) => {
   if (!touched[field]) return;
@@ -74,6 +70,7 @@ const handleInput = (field, event) => {
     props.infoStepData[field] = value;
   }
   emit("setInfoStepData", field, props.infoStepData[field]);
+  emit("isSecondStepValid", isFormValid.value);
   validateField(field);
 };
 
@@ -101,12 +98,6 @@ const isFormValid = computed(() => {
     !errors.phone
   );
 });
-
-const nextStep = () => {
-  if (isFormValid.value) {
-    emit("nextStep");
-  }
-};
 
 watch(
   () => [
@@ -182,14 +173,6 @@ watch(
         v-if="touched.phone && errors.phone"
         :errorMessage="errors.phone"
       />
-    </div>
-    <div class="sideBySideBtn">
-      <div class="backButton">
-        <button @click="backStep">Voltar</button>
-      </div>
-      <div class="submitButton">
-        <button :disabled="!isFormValid" @click="nextStep">Continuar</button>
-      </div>
     </div>
   </section>
 </template>
