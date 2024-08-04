@@ -117,7 +117,7 @@ const validateThirdStep = (isValid) => {
 
 <template>
   <main>
-    <defaultLoading :isLoading="true" />
+    <defaultLoading :isLoading="false" />
     <section class="form">
       <RegistrationHeader :title="title" :step="currentStep" />
       <EmailStep
