@@ -3,12 +3,13 @@ import { ref, computed, reactive, watch } from "vue";
 import RegistrationHeader from "./components/RegistragionHeader.vue";
 import EmailStep from "./components/EmailStep.vue";
 import InfoStep from "./components/InfoStep.vue";
+import PassWordStep from "./components/PassWordStep.vue";
 
 defineOptions({
   name: "RegistrationForm",
 });
 
-const currentStep = ref(1);
+const currentStep = ref(3); // mudar para o default 1
 const email = ref("");
 const userType = ref("fisica");
 
@@ -89,6 +90,12 @@ watch(userType, () => {
         @nextStep="nextStep"
         @backStep="backStep"
       />
+      <PassWordStep
+        v-if="currentStep === 3"
+        class="form-step"
+        @nextStep="nextStep"
+        @backStep="backStep"
+      />
     </section>
   </main>
 </template>
@@ -103,7 +110,7 @@ main {
   .form {
     background: transparent;
     width: 90%;
-    max-width: 330px;
+    max-width: 339px;
     height: auto;
     min-height: 90vh;
     margin-top: 50px;
