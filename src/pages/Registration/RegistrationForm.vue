@@ -4,6 +4,7 @@ import RegistrationHeader from "./components/RegistragionHeader.vue";
 import EmailStep from "./components/EmailStep.vue";
 import InfoStep from "./components/InfoStep.vue";
 import PassWordStep from "./components/PassWordStep.vue";
+import defaultLoading from "@/components/defaultLoading.vue";
 
 defineOptions({
   name: "RegistrationForm",
@@ -12,6 +13,7 @@ defineOptions({
 const currentStep = ref(1);
 const email = ref("");
 const userType = ref("fisica");
+const previousUserType = ref(userType.value);
 
 const finalValidation = reactive({
   firstStep: false,
@@ -30,41 +32,6 @@ const passwordData = reactive({
   password: "",
   confirmPassword: "",
 });
-
-const previousUserType = ref(userType.value);
-
-const nextStep = () => {
-  if (currentStep.value < 4) {
-    currentStep.value++;
-  }
-  if (currentStep.value === 2 && previousUserType.value !== userType.value) {
-    infoStepData.name = "";
-    infoStepData.document = "";
-    infoStepData.date = "";
-    infoStepData.phone = "";
-  }
-  previousUserType.value = userType.value;
-};
-
-const backStep = () => {
-  if (currentStep.value > 1) {
-    currentStep.value--;
-  }
-  previousUserType.value = userType.value;
-};
-
-const setEmailData = (emailData) => {
-  email.value = emailData.email;
-  userType.value = emailData.userType;
-};
-
-const setInfoStepData = (field, value) => {
-  infoStepData[field] = value;
-};
-
-const setPasswordData = (field, value) => {
-  passwordData[field] = value;
-};
 
 const title = computed(() => {
   switch (currentStep.value) {
@@ -101,6 +68,40 @@ const isStepValid = computed(() => {
   }
 });
 
+const nextStep = () => {
+  if (currentStep.value < 4) {
+    currentStep.value++;
+  }
+  if (currentStep.value === 2 && previousUserType.value !== userType.value) {
+    infoStepData.name = "";
+    infoStepData.document = "";
+    infoStepData.date = "";
+    infoStepData.phone = "";
+  }
+  previousUserType.value = userType.value;
+};
+
+const backStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--;
+  }
+  previousUserType.value = userType.value;
+};
+
+const setEmailData = (emailData) => {
+  email.value = emailData.email;
+  userType.value = emailData.userType;
+};
+
+const setInfoStepData = (field, value) => {
+  infoStepData[field] = value;
+};
+
+const setPasswordData = (field, value) => {
+  passwordData[field] = value;
+};
+
+// Métodos de validação
 const validateFirstStep = (isEmailValid) => {
   finalValidation.firstStep = isEmailValid;
 };
@@ -116,6 +117,7 @@ const validateThirdStep = (isValid) => {
 
 <template>
   <main>
+    <defaultLoading :isLoading="true" />
     <section class="form">
       <RegistrationHeader :title="title" :step="currentStep" />
       <EmailStep

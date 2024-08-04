@@ -1,5 +1,12 @@
 <script setup>
-import { computed, reactive, defineEmits, defineProps, watch } from "vue";
+import {
+  computed,
+  reactive,
+  defineEmits,
+  defineProps,
+  watch,
+  onMounted,
+} from "vue";
 import inputError from "@/components/inputError.vue";
 import {
   validateName,
@@ -18,8 +25,6 @@ const props = defineProps({
 
 const emit = defineEmits(["setInfoStepData", "isSecondStepValid"]);
 
-const isLegalPerson = computed(() => props.userType === "juridica");
-
 const errors = reactive({
   name: "",
   document: "",
@@ -32,6 +37,21 @@ const touched = reactive({
   document: false,
   date: false,
   phone: false,
+});
+
+const isLegalPerson = computed(() => props.userType === "juridica");
+
+const isFormValid = computed(() => {
+  return (
+    props.infoStepData.name &&
+    !errors.name &&
+    props.infoStepData.document &&
+    !errors.document &&
+    props.infoStepData.date &&
+    !errors.date &&
+    props.infoStepData.phone &&
+    !errors.phone
+  );
 });
 
 const validateField = (field) => {
@@ -86,18 +106,13 @@ const formatDocument = (value) => {
   }
 };
 
-const isFormValid = computed(() => {
-  return (
-    props.infoStepData.name &&
-    !errors.name &&
-    props.infoStepData.document &&
-    !errors.document &&
-    props.infoStepData.date &&
-    !errors.date &&
-    props.infoStepData.phone &&
-    !errors.phone
-  );
-});
+const validateAllFields = () => {
+  validateField("name");
+  validateField("document");
+  validateField("date");
+  validateField("phone");
+  emit("isSecondStepValid", isFormValid.value);
+};
 
 watch(
   () => [
@@ -107,18 +122,19 @@ watch(
     props.infoStepData.phone,
   ],
   () => {
-    validateField("name");
-    validateField("document");
-    validateField("date");
-    validateField("phone");
+    validateAllFields();
   }
 );
+
+onMounted(() => {
+  validateAllFields();
+});
 </script>
 
 <template>
   <section class="stepContainer">
     <div class="defaultInput">
-      <h3>{{ isLegalPerson ? "Pessoa Jurídica" : "Pessoa Física" }}</h3>
+      <h3>{{ isLegalPerson ? "Nome da Empresa" : "Nome" }}</h3>
       <input
         type="text"
         v-model="props.infoStepData.name"
