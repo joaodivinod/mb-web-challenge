@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, reactive, watch } from "vue";
+import { ref, computed, reactive } from "vue";
 import RegistrationHeader from "./components/RegistragionHeader.vue";
 import EmailStep from "./components/EmailStep.vue";
 import InfoStep from "./components/InfoStep.vue";
@@ -9,17 +9,14 @@ defineOptions({
   name: "RegistrationForm",
 });
 
-const currentStep = ref(2);
+const currentStep = ref(3);
 const email = ref("");
 const userType = ref("fisica");
 
 const finalValidation = reactive({
   firstStep: false,
   secondStep: false,
-});
-
-const areAllStepsValid = computed(() => {
-  return Object.values(finalValidation).every((step) => step === true);
+  thirdStep: false,
 });
 
 const infoStepData = reactive({
@@ -27,6 +24,11 @@ const infoStepData = reactive({
   document: "",
   date: "",
   phone: "",
+});
+
+const passwordData = reactive({
+  password: "",
+  confirmPassword: "",
 });
 
 const previousUserType = ref(userType.value);
@@ -60,6 +62,10 @@ const setInfoStepData = (field, value) => {
   infoStepData[field] = value;
 };
 
+const setPasswordData = (field, value) => {
+  passwordData[field] = value;
+};
+
 const title = computed(() => {
   switch (currentStep.value) {
     case 1:
@@ -75,12 +81,29 @@ const title = computed(() => {
   }
 });
 
+const isStepValid = computed(() => {
+  switch (currentStep.value) {
+    case 1:
+      return finalValidation.firstStep;
+    case 2:
+      return finalValidation.secondStep;
+    case 3:
+      return finalValidation.thirdStep;
+    default:
+      return false;
+  }
+});
+
 const validateFirstStep = (isEmailValid) => {
   finalValidation.firstStep = isEmailValid;
 };
+
 const validateSecondStep = (isValid) => {
-  console.log("validateSecondStep", isValid);
   finalValidation.secondStep = isValid;
+};
+
+const validateThirdStep = (isValid) => {
+  finalValidation.thirdStep = isValid;
 };
 </script>
 
@@ -107,23 +130,26 @@ const validateSecondStep = (isValid) => {
       <PassWordStep
         v-if="currentStep === 3"
         class="form-step"
-        @nextStep="nextStep"
-        @backStep="backStep"
+        :password="passwordData.password"
+        :confirmPassword="passwordData.confirmPassword"
+        @passwordsValidity="validateThirdStep"
+        @update:password="(value) => setPasswordData('password', value)"
+        @update:confirmPassword="
+          (value) => setPasswordData('confirmPassword', value)
+        "
       />
       <div
         v-if="currentStep === 1"
-        :class="['submitButton', { disabled: !finalValidation.firstStep }]"
+        :class="['submitButton', { disabled: !isStepValid }]"
       >
-        <button @click="nextStep" :disabled="!finalValidation.firstStep">
-          Continuar
-        </button>
+        <button @click="nextStep" :disabled="!isStepValid">Continuar</button>
       </div>
       <div v-else class="sideBySideBtn">
         <div class="backButton">
           <button @click="backStep">Voltar</button>
         </div>
         <div class="submitButton">
-          <button :disabled="!areAllStepsValid" @click="nextStep">
+          <button :disabled="!isStepValid" @click="nextStep">
             {{ currentStep === 4 ? "Cadastrar" : "Continuar" }}
           </button>
         </div>

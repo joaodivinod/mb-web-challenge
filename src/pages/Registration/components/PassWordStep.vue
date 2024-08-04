@@ -1,16 +1,24 @@
 <script setup>
-import { ref, computed, watch } from "vue";
-import { defineEmits } from "vue";
+import { ref, computed, watch, defineEmits, defineProps, onMounted } from "vue";
 import inputError from "@/components/inputError.vue";
 
 defineOptions({
   name: "PassWordStep",
 });
 
-const emit = defineEmits(["nextStep", "backStep"]);
+const emit = defineEmits([
+  "update:password",
+  "update:confirmPassword",
+  "passwordsValidity",
+]);
 
-const password = ref("");
-const confirmPassword = ref("");
+const props = defineProps({
+  password: { type: String, default: "", required: true },
+  confirmPassword: { type: String, default: "", required: true },
+});
+
+const password = ref(props.password);
+const confirmPassword = ref(props.confirmPassword);
 const hasTyped = ref(false);
 const hasTypedConfirm = ref(false);
 const showPassword = ref(false);
@@ -40,24 +48,21 @@ const isFormValid = computed(() => {
   return Object.values(criteria.value).every(Boolean);
 });
 
-watch(password, (newPassword) => {
-  validatePassword(newPassword);
+watch([password, confirmPassword], () => {
+  validatePassword(password.value);
   validatePasswordsMatch();
+  emit("update:password", password.value);
+  emit("update:confirmPassword", confirmPassword.value);
+  emit("passwordsValidity", isFormValid.value);
 });
 
-watch(confirmPassword, () => {
-  validatePasswordsMatch();
-});
-
-const nextStep = () => {
-  if (isFormValid.value) {
-    emit("nextStep");
+onMounted(() => {
+  if (props.password && props.confirmPassword) {
+    validatePassword(password.value);
+    validatePasswordsMatch();
+    emit("passwordsValidity", isFormValid.value);
   }
-};
-
-const backStep = () => {
-  emit("backStep");
-};
+});
 
 const togglePasswordVisibility = () => {
   showPassword.value = !showPassword.value;
@@ -187,14 +192,6 @@ const toggleConfirmPasswordVisibility = () => {
           Senhas precisam ser iguais
         </li>
       </ul>
-    </div>
-    <div class="sideBySideBtn">
-      <div class="backButton">
-        <button @click="backStep">Voltar</button>
-      </div>
-      <div class="submitButton">
-        <button :disabled="!isFormValid" @click="nextStep">Continuar</button>
-      </div>
     </div>
   </section>
 </template>
