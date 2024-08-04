@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&family=Roboto:wght@700&display=swap');
+
+// colors
+$primary-color: #FF9900;
+$secondary-color: #595959;
+
+// Fonts
+$font-poppins: "Poppins", sans-serif;
+$font-roboto: "Roboto", sans-serif;
+
+
+.stepContainer{
+  font-family: $font-poppins;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+// comum btn
+@mixin button-style($background-color, $text-color, $border-color: transparent) {
+  width: 100%;
+  height: 40px;
+  border: 2px solid $border-color;
+  background-color: $background-color;
+  color: $text-color;
+  font-size: 16px;
+  border-radius: 8px;
+  transition: 300ms;
+  &:hover {
+    cursor: pointer;
+    filter: brightness(1.2);
+  }
+  &:disabled {
+    cursor: not-allowed;
+    filter: grayscale(1);
+  }
+}
+.submitButton {
+  margin-top: 20px;
+
+  button {
+    @include button-style($primary-color, white);
+  }
+}
+
+.backButton {
+  margin-top: 20px;
+
+  button {
+    @include button-style(white, $primary-color, $primary-color);
+
+    &:hover {
+      background-color: $primary-color;
+      color: white;
+    }
+  }
+}
+
+.disabled {
+  filter: grayscale(1);
+}
+
+.sideBySideBtn {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+
+    & > * {
+      width: 48%;
+    }
+  }
+
+// comum input
+.defaultInput {
+  width: 100%;
+  margin-bottom: 20px;
+  box-sizing: border-box;
+
+  h3 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    margin-left: 5px;
+  }
+
+  input {
+    height: 40px;
+    color: rgba(0, 0, 0, 0.8);
+    width: 100%;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -ms-border-radius: 5px;
+    -o-border-radius: 5px;
+  }
+  label {
+    display: block;
+  }
+}
