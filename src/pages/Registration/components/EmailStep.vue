@@ -9,6 +9,7 @@ defineOptions({
 const props = defineProps({
   email: { type: String, required: true },
   userType: { type: String, default: "fisica", required: true },
+  isReview: { type: Boolean, default: false, required: false },
 });
 
 const emit = defineEmits(["setEmailData", "isEmailValid"]);
@@ -75,7 +76,7 @@ watch(userType, (newUserType) => {
       />
       <inputError v-if="hasTyped" :errorMessage="emailError" />
     </div>
-    <div class="email_step-type">
+    <div class="email_step-type" v-if="!isReview">
       <label>
         <input type="radio" value="fisica" v-model="userType" />
         Pessoa Física

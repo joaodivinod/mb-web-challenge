@@ -9,7 +9,7 @@ defineOptions({
   name: "RegistrationForm",
 });
 
-const currentStep = ref(3);
+const currentStep = ref(1);
 const email = ref("");
 const userType = ref("fisica");
 
@@ -89,6 +89,13 @@ const isStepValid = computed(() => {
       return finalValidation.secondStep;
     case 3:
       return finalValidation.thirdStep;
+    case 4:
+      // O quarto passo é válido apenas se todos os passos anteriores forem válidos
+      return (
+        finalValidation.firstStep &&
+        finalValidation.secondStep &&
+        finalValidation.thirdStep
+      );
     default:
       return false;
   }
@@ -138,6 +145,31 @@ const validateThirdStep = (isValid) => {
           (value) => setPasswordData('confirmPassword', value)
         "
       />
+      <div v-if="currentStep === 4">
+        <EmailStep
+          class="form-step"
+          :isReview="true"
+          :email="email"
+          :userType="userType"
+          @setEmailData="setEmailData"
+          @isEmailValid="validateFirstStep"
+        />
+        <InfoStep
+          :userType="userType"
+          :infoStepData="infoStepData"
+          @setInfoStepData="setInfoStepData"
+          @isSecondStepValid="validateSecondStep"
+        />
+        <PassWordStep
+          :password="passwordData.password"
+          :confirmPassword="passwordData.confirmPassword"
+          @passwordsValidity="validateThirdStep"
+          @update:password="(value) => setPasswordData('password', value)"
+          @update:confirmPassword="
+            (value) => setPasswordData('confirmPassword', value)
+          "
+        />
+      </div>
       <div
         v-if="currentStep === 1"
         :class="['submitButton', { disabled: !isStepValid }]"
