@@ -8,10 +8,10 @@ defineOptions({
 
 const props = defineProps({
   email: { type: String, required: true },
-  userType: { type: String, default: "Pessoa Física", required: true },
+  userType: { type: String, default: "fisica", required: true },
 });
 
-const emit = defineEmits(["nextStep", "setEmail", "setUserType"]);
+const emit = defineEmits(["setEmailData", "isEmailValid"]);
 
 const email = ref(props.email);
 const emailError = ref("");
@@ -36,17 +36,11 @@ const isEmailValid = computed(() => {
   return emailError.value === "";
 });
 
-const nextStep = () => {
-  if (isEmailValid.value) {
-    emit("setEmail", email.value);
-    emit("setUserType", userType.value);
-    emit("nextStep");
-  }
-};
-
 const handleInput = () => {
   hasTyped.value = true;
   validateEmail();
+  emit("isEmailValid", isEmailValid.value);
+  emit("setEmailData", { email: email.value, userType: userType.value });
 };
 
 watch(
@@ -62,6 +56,11 @@ watch(
     userType.value = newUserType;
   }
 );
+
+// Observa mudanças no userType e emite o evento com o valor atualizado
+watch(userType, (newUserType) => {
+  emit("setEmailData", { email: email.value, userType: newUserType });
+});
 </script>
 
 <template>
@@ -85,9 +84,6 @@ watch(
         <input type="radio" value="juridica" v-model="userType" />
         Pessoa Jurídica
       </label>
-    </div>
-    <div :class="['submitButton', { disabled: !isEmailValid }]">
-      <button @click="nextStep" :disabled="!isEmailValid">Continuar</button>
     </div>
   </section>
 </template>

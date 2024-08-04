@@ -9,9 +9,13 @@ defineOptions({
   name: "RegistrationForm",
 });
 
-const currentStep = ref(3); // mudar para o default 1
+const currentStep = ref(1);
 const email = ref("");
 const userType = ref("fisica");
+
+const finalValidation = reactive({
+  firstStep: false,
+});
 
 const infoStepData = reactive({
   name: "",
@@ -20,24 +24,31 @@ const infoStepData = reactive({
   phone: "",
 });
 
+const previousUserType = ref(userType.value);
+
 const nextStep = () => {
   if (currentStep.value < 4) {
     currentStep.value++;
   }
+  if (currentStep.value === 2 && previousUserType.value !== userType.value) {
+    infoStepData.name = "";
+    infoStepData.document = "";
+    infoStepData.date = "";
+    infoStepData.phone = "";
+  }
+  previousUserType.value = userType.value;
 };
 
 const backStep = () => {
   if (currentStep.value > 1) {
     currentStep.value--;
   }
+  previousUserType.value = userType.value;
 };
 
-const setEmail = (newEmail) => {
-  email.value = newEmail;
-};
-
-const setUserType = (newUserType) => {
-  userType.value = newUserType;
+const setEmailData = (emailData) => {
+  email.value = emailData.email;
+  userType.value = emailData.userType;
 };
 
 const setInfoStepData = (field, value) => {
@@ -59,12 +70,13 @@ const title = computed(() => {
   }
 });
 
-watch(userType, () => {
-  infoStepData.name = "";
-  infoStepData.document = "";
-  infoStepData.date = "";
-  infoStepData.phone = "";
-});
+const validateFirstStep = (isEmailValid) => {
+  if (isEmailValid) {
+    finalValidation.firstStep = true;
+  } else {
+    finalValidation.firstStep = false;
+  }
+};
 </script>
 
 <template>
@@ -76,10 +88,8 @@ watch(userType, () => {
         class="form-step"
         :email="email"
         :userType="userType"
-        @setEmail="setEmail"
-        @setUserType="setUserType"
-        @nextStep="nextStep"
-        @backStep="backStep"
+        @setEmailData="setEmailData"
+        @isEmailValid="validateFirstStep"
       />
       <InfoStep
         v-if="currentStep === 2"
@@ -96,6 +106,22 @@ watch(userType, () => {
         @nextStep="nextStep"
         @backStep="backStep"
       />
+      <div
+        v-if="currentStep === 1"
+        :class="['submitButton', { disabled: !finalValidation.firstStep }]"
+      >
+        <button @click="nextStep" :disabled="!finalValidation.firstStep">
+          Continuar
+        </button>
+      </div>
+      <div v-else class="sideBySideBtn">
+        <div class="backButton">
+          <button @click="backStep">Voltar</button>
+        </div>
+        <div class="submitButton">
+          <button :disabled="!isFormValid" @click="nextStep">Continuar</button>
+        </div>
+      </div>
     </section>
   </main>
 </template>
