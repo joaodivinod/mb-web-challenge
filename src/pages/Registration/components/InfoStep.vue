@@ -1,12 +1,5 @@
 <script setup>
-import {
-  computed,
-  reactive,
-  defineEmits,
-  defineProps,
-  watch,
-  onMounted,
-} from "vue";
+import { computed, reactive, watch, onMounted } from "vue";
 import inputError from "@/components/inputError.vue";
 import {
   validateName,

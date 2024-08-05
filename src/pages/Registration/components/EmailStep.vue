@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, defineEmits, defineProps, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import inputError from "@/components/inputError.vue";
 
 defineOptions({
@@ -58,7 +58,6 @@ watch(
   }
 );
 
-// Observa mudanças no userType e emite o evento com o valor atualizado
 watch(userType, (newUserType) => {
   emit("setEmailData", { email: email.value, userType: newUserType });
 });
