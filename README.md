@@ -1,18 +1,24 @@
 # Desafio MB We
 
-O projeto foi desenvolvido com vue js 3 via composition API com `<script setup>` + Vite, sem o uso de qualquer outra biblioteca externa.
-O Servidor foi desenvolvido com Node.js e express
+O projeto foi desenvolvido com Vue.js 3 utilizando a Composition API e o `<script setup>`, configurado com Vite. Não foram usadas bibliotecas externas adicionais no front-end. O servidor foi desenvolvido com Node.js e Express.
 
-# Instalação do projeto client
-apos clonar o projeto, rode o comando 
-`npm install` na raiz do projeto para instalar as dependencias do front
-inicie o projeto rodando o comando `npm run dev`
+# Instalação do Projeto Client
+Após clonar o projeto, siga os passos abaixo para configurar e iniciar o ambiente do front-end:
+-   Navegue até a raiz do projeto.
+- Instale as dependências necessárias executando o comando:
+`npm install`
+ - Inicie o projeto com o comando:
+`npm run dev`
 
-# Instalação do projeto server
-acessa pasta do servidor `cd/server` e então execute o comando node index.js, o servidor sera iniciado na portal 3000
+# Instalação do Projeto Server
+Para configurar e iniciar o servidor back-end, siga os passos abaixo:
+- Navegue até a pasta do servidor:
+`cd server`
+- Inicie o servidor executando o comando:
+ `node index.js`
+O servidor será iniciado na porta 3000.
 
-
-# Endpoints 
+## endpoints 
 
 #### GET /registration
 
