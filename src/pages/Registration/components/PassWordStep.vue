@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, defineEmits, defineProps, onMounted } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import inputError from "@/components/inputError.vue";
 
 defineOptions({
