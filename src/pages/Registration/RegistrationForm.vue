@@ -79,6 +79,11 @@ const nextStep = () => {
     infoStepData.phone = "";
   }
   previousUserType.value = userType.value;
+
+  if (currentStep.value === 4) {
+    console.log("vai fazer a requisição");
+    submitRegistration();
+  }
 };
 
 const backStep = () => {
@@ -112,6 +117,36 @@ const validateSecondStep = (isValid) => {
 
 const validateThirdStep = (isValid) => {
   finalValidation.thirdStep = isValid;
+};
+
+// Função para enviar dados para o servidor
+const submitRegistration = async () => {
+  try {
+    const response = await fetch("http://localhost:3000/api/registration", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email.value,
+        userType: userType.value,
+        name: infoStepData.name,
+        document: infoStepData.document,
+        phone: infoStepData.phone,
+        date: infoStepData.date,
+        password: passwordData.password,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro na resposta da API");
+    }
+
+    const result = await response.json();
+    console.log("Resposta da API:", result);
+  } catch (error) {
+    console.error("Erro ao enviar dados:", error);
+  }
 };
 </script>
 

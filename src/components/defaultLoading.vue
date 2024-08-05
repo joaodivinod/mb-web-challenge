@@ -8,8 +8,6 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
-
 defineOptions({
   name: "defaultLoading",
 });

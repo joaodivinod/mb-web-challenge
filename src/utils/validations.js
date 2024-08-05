@@ -78,3 +78,11 @@ export const validatePhone = (phone) => {
   if (phone.length !== 11) return "O telefone deve ter 11 dígitos.";
   return "";
 };
+
+export const validatePassword = (password) => {
+  criteria.value.hasUppercase = /[A-Z]/.test(password);
+  criteria.value.hasLowercase = /[a-z]/.test(password);
+  criteria.value.hasNumber = /\d/.test(password);
+  criteria.value.hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+  criteria.value.isValidLength = password.length >= 8;
+};
