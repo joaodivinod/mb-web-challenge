@@ -25,16 +25,57 @@ export const formatCNPJ = (value) => {
 };
 
 export const validateCPF = (cpf) => {
-  cpf = cpf.replace(/\D/g, "");
+  cpf = cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
   if (!cpf) return "O campo CPF não pode estar vazio.";
   if (cpf.length !== 11) return "O CPF deve ter 11 dígitos.";
-  return "";
-};
 
+  const validate = (cpf) => {
+    let sum = 0;
+    let remainder;
+
+    if (cpf === "00000000000") return false; // CPF inválido padrão
+
+    for (let i = 1; i <= 9; i++)
+      sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+
+    sum = 0;
+    for (let i = 1; i <= 10; i++)
+      sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cpf.substring(10, 11))) return false;
+
+    return true;
+  };
+
+  return validate(cpf) ? "" : "O CPF é inválido.";
+};
 export const validateCNPJ = (cnpj) => {
   cnpj = cnpj.replace(/\D/g, "");
-  if (!cnpj) return "O campo CNPJ não pode estar vazio.";
-  if (cnpj.length !== 14) return "O CNPJ deve ter 14 dígitos.";
+
+  if (!cnpj || cnpj.length !== 14) return "O CNPJ deve ter 14 dígitos.";
+
+  if (/^(\d)\1{13}$/.test(cnpj)) return "O CNPJ é inválido.";
+
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(cnpj.charAt(i)) * (i < 4 ? 5 - i : 13 - i);
+  }
+  let remainder = sum % 11;
+  let firstDigit = remainder < 2 ? 0 : 11 - remainder;
+  if (firstDigit !== parseInt(cnpj.charAt(12))) return "O CNPJ é inválido.";
+
+  sum = 0;
+  for (let i = 0; i < 13; i++) {
+    sum += parseInt(cnpj.charAt(i)) * (i < 5 ? 6 - i : 14 - i);
+  }
+  remainder = sum % 11;
+  let secondDigit = remainder < 2 ? 0 : 11 - remainder;
+  if (secondDigit !== parseInt(cnpj.charAt(13))) return "O CNPJ é inválido.";
+
   return "";
 };
 

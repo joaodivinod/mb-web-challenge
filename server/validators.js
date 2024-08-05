@@ -36,35 +36,29 @@ const validateCPF = (cpf) => {
 };
 
 const validateCNPJ = (cnpj) => {
-  cnpj = cnpj.replace(/\D/g, ""); // Remove caracteres não numéricos
-  if (!cnpj) return "O campo CNPJ não pode estar vazio.";
-  if (cnpj.length !== 14) return "O CNPJ deve ter 14 dígitos.";
+  cnpj = cnpj.replace(/\D/g, "");
 
-  const validate = (cnpj) => {
-    let sum = 0;
-    let remainder;
+  if (!cnpj || cnpj.length !== 14) return "O CNPJ deve ter 14 dígitos.";
 
-    if (cnpj === "00000000000000") return false; // CNPJ inválido padrão
+  if (/^(\d)\1{13}$/.test(cnpj)) return "O CNPJ é inválido.";
 
-    for (let i = 0; i < 12; i++)
-      sum += parseInt(cnpj.charAt(i)) * (i < 4 ? 5 - i : 9 - i);
-    remainder = sum % 11;
-    if (remainder < 2) remainder = 0;
-    else remainder = 11 - remainder;
-    if (remainder !== parseInt(cnpj.charAt(12))) return false;
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(cnpj.charAt(i)) * (i < 4 ? 5 - i : 13 - i);
+  }
+  let remainder = sum % 11;
+  let firstDigit = remainder < 2 ? 0 : 11 - remainder;
+  if (firstDigit !== parseInt(cnpj.charAt(12))) return "O CNPJ é inválido.";
 
-    sum = 0;
-    for (let i = 0; i < 13; i++)
-      sum += parseInt(cnpj.charAt(i)) * (i < 5 ? 6 - i : 9 - i);
-    remainder = sum % 11;
-    if (remainder < 2) remainder = 0;
-    else remainder = 11 - remainder;
-    if (remainder !== parseInt(cnpj.charAt(13))) return false;
+  sum = 0;
+  for (let i = 0; i < 13; i++) {
+    sum += parseInt(cnpj.charAt(i)) * (i < 5 ? 6 - i : 14 - i);
+  }
+  remainder = sum % 11;
+  let secondDigit = remainder < 2 ? 0 : 11 - remainder;
+  if (secondDigit !== parseInt(cnpj.charAt(13))) return "O CNPJ é inválido.";
 
-    return true;
-  };
-
-  return validate(cnpj) ? "" : "O CNPJ é inválido.";
+  return "";
 };
 
 const validatePhone = (phone) => {

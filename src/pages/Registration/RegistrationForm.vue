@@ -5,6 +5,8 @@ import EmailStep from "./components/EmailStep.vue";
 import InfoStep from "./components/InfoStep.vue";
 import PassWordStep from "./components/PassWordStep.vue";
 import defaultLoading from "@/components/defaultLoading.vue";
+import Notification from "@/components/Notification.vue";
+import SuccessRegister from "@/components/SuccessRegister.vue";
 
 defineOptions({
   name: "RegistrationForm",
@@ -14,7 +16,20 @@ const currentStep = ref(1);
 const email = ref("");
 const userType = ref("fisica");
 const previousUserType = ref(userType.value);
+const isLoading = ref(false);
+const showSuccessRegister = ref(false);
 
+const notificationMessage = ref("");
+const notificationType = ref("error");
+
+const showNotification = (message, type = "error") => {
+  notificationMessage.value = message;
+  notificationType.value = type;
+  setTimeout(() => {
+    notificationMessage.value = message;
+    notificationType.value = type;
+  }, 0);
+};
 const finalValidation = reactive({
   firstStep: false,
   secondStep: false,
@@ -57,7 +72,6 @@ const isStepValid = computed(() => {
     case 3:
       return finalValidation.thirdStep;
     case 4:
-      // O quarto passo é válido apenas se todos os passos anteriores forem válidos
       return (
         finalValidation.firstStep &&
         finalValidation.secondStep &&
@@ -72,18 +86,15 @@ const nextStep = () => {
   if (currentStep.value < 4) {
     currentStep.value++;
   }
+
   if (currentStep.value === 2 && previousUserType.value !== userType.value) {
     infoStepData.name = "";
     infoStepData.document = "";
     infoStepData.date = "";
     infoStepData.phone = "";
   }
-  previousUserType.value = userType.value;
 
-  if (currentStep.value === 4) {
-    console.log("vai fazer a requisição");
-    submitRegistration();
-  }
+  previousUserType.value = userType.value;
 };
 
 const backStep = () => {
@@ -93,34 +104,8 @@ const backStep = () => {
   previousUserType.value = userType.value;
 };
 
-const setEmailData = (emailData) => {
-  email.value = emailData.email;
-  userType.value = emailData.userType;
-};
-
-const setInfoStepData = (field, value) => {
-  infoStepData[field] = value;
-};
-
-const setPasswordData = (field, value) => {
-  passwordData[field] = value;
-};
-
-// Métodos de validação
-const validateFirstStep = (isEmailValid) => {
-  finalValidation.firstStep = isEmailValid;
-};
-
-const validateSecondStep = (isValid) => {
-  finalValidation.secondStep = isValid;
-};
-
-const validateThirdStep = (isValid) => {
-  finalValidation.thirdStep = isValid;
-};
-
-// Função para enviar dados para o servidor
-const submitRegistration = async () => {
+const handleSubmit = async () => {
+  isLoading.value = true;
   try {
     const response = await fetch("http://localhost:3000/api/registration", {
       method: "POST",
@@ -139,21 +124,52 @@ const submitRegistration = async () => {
     });
 
     if (!response.ok) {
-      throw new Error("Erro na resposta da API");
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.error || "Erro na resposta da API");
     }
 
     const result = await response.json();
-    console.log("Resposta da API:", result);
+    showNotification("Cadastro realizado com sucesso!", "success");
+    showSuccessRegister.value = true;
   } catch (error) {
-    console.error("Erro ao enviar dados:", error);
+    console.error("Erro ao enviar dados:", error.message);
+    showNotification(error.message, "error");
+  } finally {
+    isLoading.value = false;
   }
+};
+
+const setEmailData = (emailData) => {
+  email.value = emailData.email;
+  userType.value = emailData.userType;
+};
+
+const setInfoStepData = (field, value) => {
+  infoStepData[field] = value;
+};
+
+const setPasswordData = (field, value) => {
+  passwordData[field] = value;
+};
+
+const validateFirstStep = (isEmailValid) => {
+  finalValidation.firstStep = isEmailValid;
+};
+
+const validateSecondStep = (isValid) => {
+  finalValidation.secondStep = isValid;
+};
+
+const validateThirdStep = (isValid) => {
+  finalValidation.thirdStep = isValid;
 };
 </script>
 
 <template>
   <main>
-    <defaultLoading :isLoading="false" />
-    <section class="form">
+    <defaultLoading :isLoading="isLoading" />
+    <SuccessRegister v-if="showSuccessRegister" />
+    <section v-else class="form">
       <RegistrationHeader :title="title" :step="currentStep" />
       <EmailStep
         v-if="currentStep === 1"
@@ -213,17 +229,26 @@ const submitRegistration = async () => {
       >
         <button @click="nextStep" :disabled="!isStepValid">Continuar</button>
       </div>
-      <div v-else class="sideBySideBtn">
+      <div v-else-if="currentStep !== 4" class="sideBySideBtn">
         <div class="backButton">
           <button @click="backStep">Voltar</button>
         </div>
         <div class="submitButton">
-          <button :disabled="!isStepValid" @click="nextStep">
-            {{ currentStep === 4 ? "Cadastrar" : "Continuar" }}
+          <button :disabled="!isStepValid" @click="nextStep">Continuar</button>
+        </div>
+      </div>
+      <div v-if="currentStep === 4" class="sideBySideBtn">
+        <div class="backButton">
+          <button @click="backStep">Voltar</button>
+        </div>
+        <div class="submitButton">
+          <button :disabled="!isStepValid" @click="handleSubmit">
+            Cadastrar
           </button>
         </div>
       </div>
     </section>
+    <Notification :message="notificationMessage" :type="notificationType" />
   </main>
 </template>
 
@@ -241,6 +266,7 @@ main {
     height: auto;
     min-height: 90vh;
     margin-top: 50px;
+    margin-bottom: 50px;
 
     &-step {
       margin-top: 30px;

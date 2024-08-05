@@ -58,7 +58,6 @@ watch(
   }
 );
 
-// Observa mudanças no userType e emite o evento com o valor atualizado
 watch(userType, (newUserType) => {
   emit("setEmailData", { email: email.value, userType: newUserType });
 });
